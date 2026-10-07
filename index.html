@@ -407,6 +407,20 @@
       summary { padding: 19px 42px 19px 0; }
       footer { padding-top: 24px; }
     }
+    /* Give the logo clear vertical breathing room without changing its size. */
+    .nav-inner {
+      height: auto;
+      min-height: 0;
+      padding-block: 14px;
+    }
+    .nav-logo {
+      height: auto;
+      padding-block: 0;
+    }
+    @media (max-width: 520px) {
+      .nav-inner { height: auto; padding-block: 12px; }
+      .nav-logo { height: auto; padding-block: 0; }
+    }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .tab-progress-thumb { transition: none; }
