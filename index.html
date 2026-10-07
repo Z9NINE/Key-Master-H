@@ -101,6 +101,7 @@
       --size-progress: var(--space-2xs);
       --content-max: 1120px;
       --content-narrow: 680px;
+      --page-gutter-mobile: calc((var(--space-md) + var(--space-xl)) * 0.75);
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -455,7 +456,7 @@
     }
 
     @media (max-width: 820px) {
-      .wrap, .review-scroller, .review-progress { width: min(calc(100% - (2 * var(--space-md))), var(--content-narrow)); }
+      .wrap, .review-scroller, .review-progress { width: min(calc(100% - (2 * var(--page-gutter-mobile))), var(--content-narrow)); }
       .nav-links { gap: var(--space-lg); }
       .nav-links a:nth-child(2) { display: none; }
       .lang-switch { margin-left: var(--space-md); }
@@ -473,7 +474,7 @@
       .service-panel, .service-panel.has-lifestyle { padding: var(--space-4xl); }
       .service-lifestyle { position: static; width: 100%; height: auto; aspect-ratio: 16 / 9; margin: 0 0 var(--space-3xl); object-position: 62% 58%; }
       .steps { grid-template-columns: 1fr; }
-      .step { min-height: auto; padding: var(--space-3xl) var(--space-xl); border-top: 1px solid var(--line); border-left: 0; }
+      .step { min-height: auto; padding: var(--space-3xl) 0; border-top: 1px solid var(--line); border-left: 0; }
       .step:last-child { border-right: 0; border-bottom: 1px solid var(--line); }
       .step h3 { margin-top: var(--space-3xl); }
       .reviews-head { display: flex; align-items: flex-start; flex-direction: column; margin-bottom: var(--space-2xl); }
@@ -486,7 +487,7 @@
       .contact-item { padding: var(--space-xl) 0; }
       .contact-item + .contact-item { padding-left: 0; border-top: 1px solid var(--line); border-left: 0; }
       .faq-grid { gap: var(--space-3xl); }
-      .check-list li { white-space: normal; }
+      .check-list li { font-size: clamp(.88rem, 3.8vw, 1rem); white-space: nowrap; }
     }
 
     @media (max-width: 520px) {
@@ -495,7 +496,7 @@
         --type-display: clamp(2.65rem, 12.5vw, 3.55rem);
         --type-display-zh: clamp(2.35rem, 11vw, 3rem);
       }
-      .wrap, .review-scroller, .review-progress { width: calc(100% - (2 * var(--space-md))); }
+      .wrap, .review-scroller, .review-progress { width: calc(100% - (2 * var(--page-gutter-mobile))); }
       .nav-inner { padding-block: var(--space-sm); }
       .nav-logo img { width: 96px; }
       .nav-links { display: none; }
