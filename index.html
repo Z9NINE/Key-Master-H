@@ -423,22 +423,25 @@
       gap: var(--space-lg);
       padding: var(--space-3xs) 0 var(--space-xl);
       overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-padding-inline: 0;
       overscroll-behavior-inline: contain;
+      /* Edge fades: each side fades in only when there is more to scroll that way (k is set from JS, 0 to 1). */
+      --review-fade: 72px;
+      --fade-l-k: 0;
+      --fade-r-k: 1;
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 calc(var(--review-fade) * var(--fade-l-k)), #000 calc(100% - var(--review-fade) * var(--fade-r-k)), transparent);
+      mask-image: linear-gradient(to right, transparent, #000 calc(var(--review-fade) * var(--fade-l-k)), #000 calc(100% - var(--review-fade) * var(--fade-r-k)), transparent);
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
     .review-scroller::-webkit-scrollbar { display: none; }
     .review-scroller::before, .review-scroller::after { display: none; }
     .review-scroller.is-draggable { cursor: grab; }
-    .review-scroller.is-dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+    .review-scroller.is-dragging { cursor: grabbing; user-select: none; }
     .review-scroller.is-dragging .review-card { pointer-events: none; }
     .review-card {
       min-width: 0;
       flex: 0 0 clamp(264px, 27vw, 324px);
       overflow: hidden;
-      scroll-snap-align: start;
       border: 1px solid var(--line);
       border-radius: var(--radius-md);
       background: var(--surface);
@@ -497,6 +500,7 @@
 
     @media (max-width: 820px) {
       .wrap, .review-scroller, .review-progress { width: min(calc(100% - (2 * var(--page-gutter-mobile))), var(--content-narrow)); }
+      .review-scroller { --review-fade: 44px; }
       .nav-links { gap: var(--space-lg); }
       .nav-links a:nth-child(2) { display: none; }
       .lang-switch { margin-left: var(--space-md); }
@@ -549,7 +553,7 @@
       .hero-copy > p { margin-top: var(--space-lg); font-size: var(--type-body); }
       .hero-actions { margin-top: var(--space-2xl); flex-direction: column; }
       .button { width: 100%; }
-      .review-scroller { gap: var(--space-md); }
+      .review-scroller { gap: var(--space-md); --review-fade: 28px; }
       .review-card { width: 100%; flex-basis: min(82vw, 320px); }
       .service-panel { min-height: 0; padding: var(--space-3xl) var(--space-xl); }
       .service-panel h3 { font-size: var(--type-title-md); }
@@ -2421,10 +2425,17 @@ requestAnimationFrame(tick);
       var finePointer = window.matchMedia('(min-width: 821px) and (pointer: fine)');
       var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+      var reviewFadeWidth = 0;
+      function measureReviewFade() {
+        reviewFadeWidth = parseFloat(getComputedStyle(reviewScroller).getPropertyValue('--review-fade')) || 0;
+      }
       function reviewStops() {
         var scrollerBox = reviewScroller.getBoundingClientRect();
-        return Array.prototype.map.call(reviewScroller.querySelectorAll('.review-card'), function (card) {
-          return card.getBoundingClientRect().left - scrollerBox.left + reviewScroller.scrollLeft;
+        var maxScroll = Math.max(0, reviewScroller.scrollWidth - reviewScroller.clientWidth);
+        return Array.prototype.map.call(reviewScroller.querySelectorAll('.review-card'), function (card, index) {
+          var left = card.getBoundingClientRect().left - scrollerBox.left + reviewScroller.scrollLeft;
+          // The arrows land each card just clear of the left fade; the first card sits at the start, where there is none.
+          return index === 0 ? 0 : Math.min(maxScroll, Math.max(0, left - reviewFadeWidth));
         });
       }
       function syncReviewProgress() {
@@ -2437,6 +2448,11 @@ requestAnimationFrame(tick);
         reviewProgressThumb.style.transform = 'translate3d(' + offset + 'px, 0, 0)';
         if (reviewPrev) reviewPrev.disabled = reviewScroller.scrollLeft <= 2;
         if (reviewNext) reviewNext.disabled = reviewScroller.scrollLeft >= maxScroll - 2;
+        // Each edge fades in over the first fade-width of scroll, so nothing is faded at either end.
+        var fadeL = reviewFadeWidth ? Math.min(1, Math.max(0, reviewScroller.scrollLeft / reviewFadeWidth)) : 0;
+        var fadeR = reviewFadeWidth ? Math.min(1, Math.max(0, (maxScroll - reviewScroller.scrollLeft) / reviewFadeWidth)) : 0;
+        reviewScroller.style.setProperty('--fade-l-k', fadeL.toFixed(3));
+        reviewScroller.style.setProperty('--fade-r-k', fadeR.toFixed(3));
       }
       function scrollReview(direction) {
         var stops = reviewStops();
@@ -2452,6 +2468,7 @@ requestAnimationFrame(tick);
             if (stops[index] < current - 2) { target = stops[index]; break; }
           }
         }
+        stopReviewGlide();
         reviewScroller.scrollTo({ left: target, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
       }
       function updateDragAffordance() {
@@ -2464,22 +2481,45 @@ requestAnimationFrame(tick);
       var dragActive = false;
       var dragStartX = 0;
       var dragStartScroll = 0;
+      var dragLastX = 0;
+      var dragLastTime = 0;
+      var dragVelocity = 0; // px per ms, positive scrolls right
+      var glideFrame = 0;
+      function stopReviewGlide() {
+        if (glideFrame) cancelAnimationFrame(glideFrame);
+        glideFrame = 0;
+      }
+      // After a mouse drag, keep moving with the release speed and ease to a stop wherever that lands, like touch scrolling.
+      function glideReview(velocity) {
+        var last = performance.now();
+        stopReviewGlide();
+        glideFrame = requestAnimationFrame(function step(now) {
+          var dt = Math.min(32, now - last);
+          var maxScroll = reviewScroller.scrollWidth - reviewScroller.clientWidth;
+          last = now;
+          reviewScroller.scrollLeft += velocity * dt;
+          velocity *= Math.exp(-dt / 325);
+          var atEnd = reviewScroller.scrollLeft <= 0 || reviewScroller.scrollLeft >= maxScroll;
+          glideFrame = Math.abs(velocity) > 0.02 && !atEnd ? requestAnimationFrame(step) : 0;
+        });
+      }
       function finishReviewDrag(event) {
         if (!dragActive) return;
         dragActive = false;
         reviewScroller.classList.remove('is-dragging');
         if (reviewScroller.hasPointerCapture(event.pointerId)) reviewScroller.releasePointerCapture(event.pointerId);
-        var stops = reviewStops();
-        var nearest = stops.reduce(function (best, stop) {
-          return Math.abs(stop - reviewScroller.scrollLeft) < Math.abs(best - reviewScroller.scrollLeft) ? stop : best;
-        }, stops[0] || 0);
-        reviewScroller.scrollTo({ left: nearest, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+        var paused = performance.now() - dragLastTime > 80; // held still before letting go: stop right there
+        if (!paused && !reduceMotion.matches && Math.abs(dragVelocity) > 0.1) glideReview(dragVelocity);
       }
       reviewScroller.addEventListener('pointerdown', function (event) {
         if (!finePointer.matches || event.button !== 0) return;
+        stopReviewGlide();
         dragActive = true;
         dragStartX = event.clientX;
         dragStartScroll = reviewScroller.scrollLeft;
+        dragLastX = event.clientX;
+        dragLastTime = performance.now();
+        dragVelocity = 0;
         reviewScroller.classList.add('is-dragging');
         reviewScroller.setPointerCapture(event.pointerId);
         event.preventDefault();
@@ -2487,17 +2527,23 @@ requestAnimationFrame(tick);
       reviewScroller.addEventListener('pointermove', function (event) {
         if (!dragActive) return;
         reviewScroller.scrollLeft = dragStartScroll - (event.clientX - dragStartX);
+        var now = performance.now();
+        if (now > dragLastTime) dragVelocity = 0.8 * ((dragLastX - event.clientX) / (now - dragLastTime)) + 0.2 * dragVelocity;
+        dragLastX = event.clientX;
+        dragLastTime = now;
         event.preventDefault();
       });
       reviewScroller.addEventListener('pointerup', finishReviewDrag);
       reviewScroller.addEventListener('pointercancel', finishReviewDrag);
       reviewScroller.addEventListener('dragstart', function (event) { event.preventDefault(); });
       reviewScroller.addEventListener('scroll', syncReviewProgress, { passive: true });
-      window.addEventListener('resize', syncReviewProgress);
-      window.addEventListener('load', syncReviewProgress);
+      reviewScroller.addEventListener('wheel', stopReviewGlide, { passive: true });
+      window.addEventListener('resize', function () { measureReviewFade(); syncReviewProgress(); });
+      window.addEventListener('load', function () { measureReviewFade(); syncReviewProgress(); });
       if (finePointer.addEventListener) finePointer.addEventListener('change', updateDragAffordance);
       else finePointer.addListener(updateDragAffordance);
       updateDragAffordance();
+      measureReviewFade();
       syncReviewProgress();
     }());
   </script>
