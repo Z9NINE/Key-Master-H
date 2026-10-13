@@ -693,11 +693,12 @@ const TIP_DEPTH = 31.74;         // how far the key tip pushes the bottom triang
 const TIP_PARK = TIP_DEPTH + 4;  // where the triangle waits, tucked fully inside the body
 const SHACKLE_LOCKED = 18;       // shackle sits this far lower while locked
 const SHACKLE_POP = -42;         // how far the shackle shoots up on the click before springing back
+const MIN_TURNS = 2;             // the square always completes at least this many quarter-turns
 const NS = 'http://www.w3.org/2000/svg';
 
 function schedule(loadedAt = Infinity) {
-  const L = Math.max(0.3, loadedAt);
-  const n = Number.isFinite(L) ? Math.ceil(L / BEAT) : Infinity; // quarter-turns started before load
+  const L = loadedAt;
+  const n = Number.isFinite(L) ? Math.max(MIN_TURNS, Math.ceil(L / BEAT)) : Infinity; // quarter-turns before unlocking
   const T1 = n * BEAT;         // spinning stops, square becomes the locked lock
   const Tk = T1 + BEAT / 2;    // key cutout starts pushing in
   const Tc = Tk + BEAT;        // key bottoms out: click, unlock
