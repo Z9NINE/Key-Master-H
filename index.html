@@ -93,6 +93,7 @@
       --type-symbol: clamp(1.5rem, 0.6vw + 1.35rem, 1.7rem);
       --type-display: clamp(3.35rem, 6.4vw, 5.75rem);
       --type-display-zh: clamp(3rem, 5.6vw, 5rem);
+      --type-display-es: clamp(3.1rem, 6vw, 5.5rem);
 
       /* Repeating component sizes also derive from shared steps. */
       --size-control: clamp(2.875rem, 3.2vw, 3.125rem);
@@ -248,6 +249,7 @@
     h1 { margin-top: var(--space-lg); max-width: 720px; font-size: var(--type-display); line-height: 1.08; letter-spacing: -.045em; }
     h1 span { display: inline-block; white-space: nowrap; }
     html[lang="zh-CN"] h1 { font-size: var(--type-display-zh); line-height: 1.14; letter-spacing: -.025em; }
+    html[lang="es-MX"] h1 { font-size: var(--type-display-es); line-height: 1.1; letter-spacing: -.04em; }
     .hero-copy > p { max-width: 580px; margin: var(--space-xl) 0 0; color: var(--muted-night); font-size: var(--type-body-lg); line-height: 1.55; }
     .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-3xl); }
     .button {
@@ -524,6 +526,7 @@
         --type-title-lg: clamp(2rem, 10vw, 2.65rem);
         --type-display: clamp(2.65rem, 12.5vw, 3.55rem);
         --type-display-zh: clamp(2.35rem, 11vw, 3rem);
+        --type-display-es: clamp(2rem, 9.5vw, 2.5rem);
       }
       .wrap, .review-scroller, .review-progress { width: calc(100% - (2 * var(--page-gutter-mobile))); }
       .nav-inner { padding-block: var(--space-sm); }
@@ -566,6 +569,7 @@
       </div>
       <div class="lang-switch" role="group" aria-label="Language" data-i18n-aria="languageLabel">
         <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="es" aria-pressed="false">ES</button>
         <button type="button" data-lang="zh" aria-pressed="false">中文</button>
       </div>
     </div>
@@ -1923,12 +1927,35 @@ requestAnimationFrame(tick);
           contactTitle: '欢迎到店或来电。', contactBody: '门店位于 El Monte；到访前如有疑问，欢迎来电咨询。', contactLifestyleAlt: '锁匠正在操作配钥匙机器', addressLabel: '地址', addressValue: '2160 Durfee Ave #2, El Monte, CA 91733', locksmithLabel: '锁匠手机', businessLabel: '商家电话', contactNote: '使用手机时，轻触电话号码即可拨打。',
           faqTitle: '常见问题', faq1Q: '所有钥匙都能复制吗？', faq1A: '并非所有钥匙都能复制。受限制、已损坏或特殊类型的钥匙可能需要其他解决方案。Key Master 会在查看钥匙后确认可选方案。', faq3Q: '没有原钥匙怎么办？', faq3A: '请带上您现有的所有钥匙信息。下一步方案取决于锁具或车辆情况，需要逐一确认。',
           footerLine: '邻里贴心帮手，认真配好每一把钥匙。'
+        },
+        es: {
+          title: 'Key Master', skip: 'Saltar al contenido', homeLabel: 'Inicio de Key Master', languageLabel: 'Idioma',
+          navServices: 'En qué te ayudamos', navProcess: 'Cómo funciona', navContact: 'Contacto',
+          eyebrow: 'Tu ayudante de llaves del vecindario', heroTitle1: 'Una llave de repuesto,', heroTitle2: 'sin complicaciones.',
+          heroBody: 'Ayuda amable y directa con llaves de casa y de carro, en tu tienda local de El Monte.',
+          heroPrimary: 'Ver en qué te ayudamos', heroSecondary: 'Llama o visítanos',
+          servicesTitle: 'Aquí estamos cuando necesites una extra.', servicesBody: 'Elige el tipo de llave que necesitas y mira en qué te podemos ayudar.',
+          servicesLabel: 'Servicios de llaves', houseTab: 'Llaves de casa', carTab: 'Llaves de carro',
+          housePanelTitle: 'Un poco más de tranquilidad.', housePanelBody: 'Una copia bien hecha puede hacerte la vida diaria un poco más fácil.',
+          houseItem1: 'Llaves de puerta principal y lateral', houseItem2: 'Copias para la familia o visitas', houseItem3: 'Una sola copia o juegos completos', serviceHouseAlt: 'Primer plano de una llave de casa cortándose en una máquina de corte de llaves',
+          carPanelTitle: 'Encontremos la llave de carro indicada.', carPanelBody: 'Las opciones dependen del vehículo y de la llave que usas actualmente.',
+          carItem1: 'Muchas marcas y modelos', carItem2: 'Llaves de carro estándar', carItem3: 'Llaves inteligentes', serviceCarAlt: 'Llave de carro sobre un asiento de cuero',
+          processTitle: 'Fácil, del saludo a la entrega.', processBody: 'Qué traer y qué sigue.',
+          step1Title: 'Trae la llave original', step1Body: 'Trae la llave original que funciona. Si es para un carro, trae también el año, la marca, el modelo y el tipo de llave que usas.', step1Alt: 'Mano sosteniendo dos llaves de carro junto a un vehículo',
+          step2Title: 'Confirmamos la opción correcta', step2Body: 'Identificamos el perfil de la llave, revisamos la compatibilidad y te explicamos la opción antes de empezar el corte.', step2Alt: 'Filas de llaves vírgenes y llaves inteligentes en una pared roja de la tienda',
+          step3Title: 'Servicio rápido en la tienda', step3Body: 'Muchas copias se pueden hacer durante tu visita; después las revisamos y las comparamos con la original antes de entregártelas.', step3Alt: 'Llaves de carro revisándose con una tableta de diagnóstico dentro de un vehículo',
+          showcaseTitle: 'Fotos de nuestros clientes contentos.', showcaseHint: 'Desliza o desplázate para ver trabajos de llaves de carro terminados.', showcaseLabel: 'Galería de fotos de trabajos de clientes', showcaseControlsLabel: 'Controles de la galería', showcasePrevLabel: 'Foto anterior', showcaseNextLabel: 'Foto siguiente',
+          reviewBMW: 'Servicio de llave inteligente BMW', reviewLexus: 'Servicio de llave inteligente Lexus', reviewAudi: 'Servicio de llave inteligente Audi Q7', reviewLambo: 'Servicio de llave inteligente Lamborghini', reviewJeep: 'Servicio de llaves Jeep', reviewPorsche: 'Servicio de llave inteligente Porsche', reviewMercedes: 'Servicio de llave inteligente Mercedes', reviewFerrari: 'Servicio de llaves Ferrari', reviewSClass: 'Servicio de llave inteligente Mercedes Clase S', reviewBMWX2: 'Servicio de llave inteligente BMW X2',
+          reviewBMWAlt: 'Dos llaves inteligentes BMW frente a un volante BMW', reviewLexusAlt: 'Dos llaves inteligentes Lexus frente a un volante Lexus', reviewAudiAlt: 'Dos llaves inteligentes Audi dentro de un Audi Q7', reviewLamboAlt: 'Dos llaves inteligentes Lamborghini junto a un Lamborghini', reviewJeepAlt: 'Dos llaves Jeep junto a un Jeep', reviewPorscheAlt: 'Dos llaves inteligentes Porsche junto a un Porsche', reviewMercedesAlt: 'Dos llaves inteligentes Mercedes frente a un volante Mercedes', reviewFerrariAlt: 'Una llave roja de Ferrari junto a un Ferrari', reviewSClassAlt: 'Dos llaves inteligentes Mercedes dentro de un Mercedes Clase S', reviewBMWX2Alt: 'Dos llaves inteligentes BMW junto a un BMW X2',
+          contactTitle: 'Visítanos o llámanos.', contactBody: 'Estamos en El Monte; llámanos si tienes alguna pregunta antes de tu visita.', contactLifestyleAlt: 'Cerrajero operando una máquina de corte de llaves', addressLabel: 'Dirección', addressValue: '2160 Durfee Ave #2, El Monte, CA 91733', locksmithLabel: 'Directo con el cerrajero', businessLabel: 'Teléfono del negocio', contactNote: 'En el celular, toca un número de teléfono para llamar.',
+          faqTitle: '¿Tienes preguntas? Te ayudamos.', faq1Q: '¿Todas las llaves se pueden copiar?', faq1A: 'No todas las llaves se pueden copiar. Algunas llaves restringidas, dañadas o especiales pueden necesitar otra solución. Key Master confirmará la opción disponible después de ver la llave.', faq3Q: '¿Y si no tengo la llave original?', faq3A: 'Trae cualquier información que tengas sobre la llave. El siguiente paso depende de la cerradura o del vehículo, así que las opciones se revisan caso por caso.',
+          footerLine: 'Ayuda de vecinos, una llave a la vez.'
         }
       };
       var languageButtons = Array.prototype.slice.call(document.querySelectorAll('[data-lang]'));
       function setLanguage(language) {
         var chosen = copy[language] ? language : 'en';
-        document.documentElement.lang = chosen === 'zh' ? 'zh-CN' : 'en';
+        document.documentElement.lang = chosen === 'zh' ? 'zh-CN' : chosen === 'es' ? 'es-MX' : 'en';
         document.title = copy[chosen].title;
         document.querySelectorAll('[data-i18n]').forEach(function (element) {
           element.textContent = copy[chosen][element.getAttribute('data-i18n')];
